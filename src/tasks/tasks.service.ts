@@ -42,18 +42,9 @@ export class TasksService {
   //   return tasks;
   // }
 
-  // createTask(createTaskDto: CreateTaskDto): Task {
-  //   const { title, description } = createTaskDto;
-
-  //   const task: Task = {
-  //     id: uuid(),
-  //     title,
-  //     description,
-  //     status: TaskStatus.OPEN,
-  //   };
-  //   this.tasks.push(task);
-  //   return task;
-  // }
+  createTask(createTaskDto: CreateTaskDto) {
+    return this.taskRepository.createTask(createTaskDto)
+  }
 
   // deleteTask(id: string) {
   //   const found = this.getTaskById(id)
