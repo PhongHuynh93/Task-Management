@@ -1,6 +1,5 @@
 import { Injectable, NotFoundException, Post } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { v1 as uuid } from 'uuid';
 import { CreateTaskDto } from './dto/create-task.dto';
 import { GetTasksFilterDto } from './dto/get-tasks-filter.dto';
 import { TaskStatus } from './task-status.enum';
@@ -13,11 +12,6 @@ export class TasksService {
     private taskRepository: TaskRepository
   ) {}
 
-
-  // getAllTasks() {
-  //   return this.tasks;
-  // }
-
   async getTaskById(id: number) {
     const found = await this.taskRepository.findOne(id)
     if (!found) {
@@ -26,22 +20,21 @@ export class TasksService {
     return found
   }
 
-  // getTasksWithFilters(filterDto: GetTasksFilterDto) {
-  //   const { status, search } = filterDto;
-  //   let tasks = this.getAllTasks();
+  async getTasksWithFilters(filterDto: GetTasksFilterDto) {
+    const { status, search } = filterDto;
+    let query = this.taskRepository.createQueryBuilder('task')
 
-  //   if (status) {
-  //     tasks = tasks.filter((task) => task.status == status);
-  //   }
+    if (status) {
+      query.andWhere('task.status = :status', { status })
+    }
 
-  //   if (search) {
-  //     tasks = tasks.filter(
-  //       (task) =>
-  //         task.title.includes(search) || task.description.includes(search),
-  //     );
-  //   }
-  //   return tasks;
-  // }
+    if (search) {
+      query.andWhere('task.title LIKE :search OR task.description LIKE :search', { search: `%${search}%` })
+    }
+
+    const tasks = await query.getMany()
+    return tasks
+  }
 
   async createTask(createTaskDto: CreateTaskDto) {
     return this.taskRepository.createTask(createTaskDto)
