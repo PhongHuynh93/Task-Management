@@ -11,6 +11,6 @@ export class AuthService {
     ) { }
 
     async signUp(authCredentialsDto: AuthCredentialsDto) {
-        this.userRepository.signUp
+        this.userRepository.signUp(authCredentialsDto)
     }
 }
