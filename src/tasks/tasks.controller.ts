@@ -28,8 +28,11 @@ export class TasksController {
 
   @Get()
   @UsePipes(ValidationPipe)
-  getTasks(@Query() filterDto: GetTasksFilterDto) {
-    return this.tasksService.getTasks(filterDto)
+  getTasks(
+    @Query() filterDto: GetTasksFilterDto,
+    @GetUser() user: User
+  ) {
+    return this.tasksService.getTasks(filterDto, user)
   }
 
   @Get('/:id')

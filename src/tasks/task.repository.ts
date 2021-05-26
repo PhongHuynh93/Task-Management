@@ -7,9 +7,11 @@ import { GetTasksFilterDto } from "./dto/get-tasks-filter.dto";
 
 @EntityRepository(Task)
 export class TaskRepository extends Repository<Task> {
-    async getTasks(filterDto: GetTasksFilterDto) {
+    async getTasks(filterDto: GetTasksFilterDto, user: User) {
         const { status, search } = filterDto;
         let query = this.createQueryBuilder('task')
+
+        query.where('task.userId = :userId', { userId: user.id })
 
         if (status) {
             query.andWhere('task.status = :status', { status })
@@ -34,7 +36,7 @@ export class TaskRepository extends Repository<Task> {
         task.status = TaskStatus.OPEN
 
         await task.save()
-        
+
         delete task.user
 
         return task
