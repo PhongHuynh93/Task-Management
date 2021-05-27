@@ -3,6 +3,7 @@ import {
   Controller,
   Delete,
   Get,
+  Logger,
   Param,
   ParseIntPipe,
   Patch,
@@ -24,6 +25,7 @@ import { User } from 'src/auth/user.entity';
 @Controller('tasks')
 @UseGuards(AuthGuard())
 export class TasksController {
+  private logger = new Logger('TasksController')
   constructor(private tasksService: TasksService) { }
 
   @Get()
@@ -32,6 +34,7 @@ export class TasksController {
     @Query() filterDto: GetTasksFilterDto,
     @GetUser() user: User
   ) {
+    this.logger.verbose(`User ${user.username} with filter ${filterDto.search}`)
     return this.tasksService.getTasks(filterDto, user)
   }
 
