@@ -1,2 +1,5 @@
+server:
+  origin: s3
+
 db:
   synchronize: false
