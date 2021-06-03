@@ -41,25 +41,25 @@ describe('TaskService', () => {
     })
 
     describe('getTaskById', () => {
+        const mockTask = {
+            id: 1,
+            title: 'hello',
+            description: 'des',
+            status: TaskStatus.IN_PROGRESS,
+            userId: 2
+        }
         test('test get task by id successfully', async () => {
-            const resultTask = {
-                id: 1,
-                title: 'hello',
-                description: 'des',
-                status: TaskStatus.IN_PROGRESS,
-                userId: 2
-            }
-            taskRepository.findOne.mockResolvedValue(resultTask)
-            expect(taskRepository.findOne).not.toHaveBeenCalled()
+            taskRepository.findOne.mockResolvedValue(mockTask)
             const found = await tasksService.getTaskById(1, mockUser)
             expect(taskRepository.findOne).toHaveBeenCalledWith(
                 { where: { id: 1, userId: mockUser.id } }
             )
-            expect(found).toEqual(resultTask);
+            expect(found).toEqual(mockTask);
 
         })
-        // test('test get task by id failed', async () => {
-
-        // })
+        test('test get task by id failed', () => {
+            taskRepository.findOne.mockResolvedValue(null)
+            expect(tasksService.getTaskById(1, mockUser)).rejects.toThrow()
+        })
     })
 })
