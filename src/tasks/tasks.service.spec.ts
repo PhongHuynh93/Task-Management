@@ -1,11 +1,13 @@
 import { Test } from '@nestjs/testing';
 import { TasksService } from './tasks.service';
 import { TaskRepository } from './task.repository';
-import { GetTasksFilterDto } from 'dist/tasks/dto/get-tasks-filter.dto';
-import { TaskStatus } from 'dist/tasks/task-status.enum';
+import { User } from 'src/auth/user.entity';
+import { TaskStatus } from './task-status.enum';
+import { GetTasksFilterDto } from './dto/get-tasks-filter.dto';
  
 const mockTaskRepository = () => ({
-    getTasks: jest.fn()
+    getTasks: jest.fn(),
+    findOne: jest.fn()
 })
 
 const mockUser = { id: 12, username: 'Test user' };
@@ -36,5 +38,28 @@ describe('TaskService', () => {
             expect(taskRepository.getTasks).toHaveBeenCalled();
             expect(result).toEqual('someValue');
         })
+    })
+
+    describe('getTaskById', () => {
+        test('test get task by id successfully', async () => {
+            const resultTask = {
+                id: 1,
+                title: 'hello',
+                description: 'des',
+                status: TaskStatus.IN_PROGRESS,
+                userId: 2
+            }
+            taskRepository.findOne.mockResolvedValue(resultTask)
+            expect(taskRepository.findOne).not.toHaveBeenCalled()
+            const found = await tasksService.getTaskById(1, mockUser)
+            expect(taskRepository.findOne).toHaveBeenCalledWith(
+                { where: { id: 1, userId: mockUser.id } }
+            )
+            expect(found).toEqual(resultTask);
+
+        })
+        // test('test get task by id failed', async () => {
+
+        // })
     })
 })
