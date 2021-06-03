@@ -4,6 +4,7 @@ import { TaskRepository } from './task.repository';
 import { User } from 'src/auth/user.entity';
 import { TaskStatus } from './task-status.enum';
 import { GetTasksFilterDto } from './dto/get-tasks-filter.dto';
+import { NotFoundException } from '@nestjs/common';
  
 const mockTaskRepository = () => ({
     getTasks: jest.fn(),
@@ -59,7 +60,7 @@ describe('TaskService', () => {
         })
         test('test get task by id failed', () => {
             taskRepository.findOne.mockResolvedValue(null)
-            expect(tasksService.getTaskById(1, mockUser)).rejects.toThrow()
+            expect(tasksService.getTaskById(1, mockUser)).rejects.toThrow(NotFoundException)
         })
     })
 })
