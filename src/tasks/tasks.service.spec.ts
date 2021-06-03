@@ -6,11 +6,13 @@ import { TaskStatus } from './task-status.enum';
 import { GetTasksFilterDto } from './dto/get-tasks-filter.dto';
 import { NotFoundException } from '@nestjs/common';
 import { CreateTaskDto } from './dto/create-task.dto';
+import { DeleteResult } from 'typeorm';
 
 const mockTaskRepository = () => ({
     getTasks: jest.fn(),
     findOne: jest.fn(),
     createTask: jest.fn(),
+    delete: jest.fn()
 })
 
 const mockUser = { id: 12, username: 'Test user' };
@@ -80,6 +82,28 @@ describe('TaskService', () => {
                 createTaskDto, mockUser
             )
             expect(found).toEqual(mockTask);
+        })
+    })
+
+    describe('deleteTask', () => {
+        test('test deleteTask successfully', async () => {
+            const deleteResult = {
+                affected: 1
+            }
+            taskRepository.delete.mockResolvedValue(deleteResult)
+            expect(taskRepository.delete).not.toHaveBeenCalled()
+            const found = await tasksService.deleteTask(2, mockUser)
+            expect(taskRepository.delete).toHaveBeenCalledWith(
+                { id: 2, userId: mockUser.id }
+            )
+            // expect(found).toEqual(mockTask);
+        })
+        test('test deleteTask failed', () => {
+            const deleteResult = {
+                affected: 0
+            }
+            taskRepository.delete.mockResolvedValue(deleteResult)
+            expect(tasksService.deleteTask(2, mockUser)).rejects.toThrow(NotFoundException)
         })
     })
 })
