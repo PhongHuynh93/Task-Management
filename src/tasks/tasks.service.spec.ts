@@ -5,13 +5,22 @@ import { User } from 'src/auth/user.entity';
 import { TaskStatus } from './task-status.enum';
 import { GetTasksFilterDto } from './dto/get-tasks-filter.dto';
 import { NotFoundException } from '@nestjs/common';
- 
+import { CreateTaskDto } from './dto/create-task.dto';
+
 const mockTaskRepository = () => ({
     getTasks: jest.fn(),
-    findOne: jest.fn()
+    findOne: jest.fn(),
+    createTask: jest.fn(),
 })
 
 const mockUser = { id: 12, username: 'Test user' };
+const mockTask = {
+    id: 1,
+    title: 'hello',
+    description: 'des',
+    status: TaskStatus.IN_PROGRESS,
+    userId: 2
+}
 
 describe('TaskService', () => {
     let tasksService
@@ -42,13 +51,7 @@ describe('TaskService', () => {
     })
 
     describe('getTaskById', () => {
-        const mockTask = {
-            id: 1,
-            title: 'hello',
-            description: 'des',
-            status: TaskStatus.IN_PROGRESS,
-            userId: 2
-        }
+
         test('test get task by id successfully', async () => {
             taskRepository.findOne.mockResolvedValue(mockTask)
             const found = await tasksService.getTaskById(1, mockUser)
@@ -61,6 +64,22 @@ describe('TaskService', () => {
         test('test get task by id failed', () => {
             taskRepository.findOne.mockResolvedValue(null)
             expect(tasksService.getTaskById(1, mockUser)).rejects.toThrow(NotFoundException)
+        })
+    })
+
+    describe('createTask', () => {
+        test('test createtask successfully', async () => {
+            taskRepository.createTask.mockResolvedValue(mockTask)
+            expect(taskRepository.createTask).not.toHaveBeenCalled()
+            const createTaskDto: CreateTaskDto = {
+                title: 'a',
+                description: 'b'
+            }
+            const found = await tasksService.createTask(createTaskDto, mockUser)
+            expect(taskRepository.createTask).toHaveBeenCalledWith(
+                createTaskDto, mockUser
+            )
+            expect(found).toEqual(mockTask);
         })
     })
 })
